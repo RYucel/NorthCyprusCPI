@@ -9,50 +9,42 @@ st.title('North Cyprus CPI Forecast')
 # Load data
 df = pd.read_csv('inflation88seti.csv')  
 
-# Convert date
+# Prepare datetime 
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
-
-# Set date as index 
 df.set_index('Date', inplace=True)
+df.index = df.index.to_period('M').to_timestamp()
+df.index.freq = 'MS'
 
-# Convert dates to month start
-df.index = df.index.to_period('M').to_timestamp() 
+# Define df
+df = df.copy() 
 
-# Set frequency 
-df.index.freq = 'MS'  
+# Slider
+st.session_state['periods'] = st.slider('Periods', min_value=6, max_value=24, value=12)
 
-# Redefine df 
-df = df.copy()  
-
-# Slider for forecast periods
-periods = st.slider('Periods', min_value=6, max_value=24, value=12)
-
-# Train model
-model = auto_arima(df['KKTC_CPI']) 
-
-# Interactive plot 
-fig, ax = plt.subplots()
-df['KKTC_CPI'].plot(ax=ax)
+# Model
+model = auto_arima(df['KKTC_CPI'])
 
 # Tooltips
 tooltip = mpld3.plugins.PointLabelTooltip(df.index, labels=df['KKTC_CPI'].round(2))
 
+# Plot 
+fig, ax = plt.subplots()
+df['KKTC_CPI'].plot(ax=ax)
+
 def plot_forecast():
 
-  # Forecast
-  fc = model.predict(periods)    
+  fc = model.predict(st.session_state['periods'])  
 
-  # Plot 
   ax.clear()
   df['KKTC_CPI'].plot(ax=ax)
   fc.plot(ax=ax, legend=False)
-
-  # Tooltip
+  
   mpld3.plugins.connect(fig, tooltip)
 
 # Initial call
-plot_forecast()  
+plot_forecast()
 
-# On slider change 
+# On change 
+st.session_state['periods'].on_change(plot_forecast)
+
 st.pyplot(fig)
-st.slider.on_change(plot_forecast)
