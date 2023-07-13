@@ -39,7 +39,10 @@ st.plotly_chart(fig)
 forecast_df['YoY Change'] = forecast_df['Forecast'].pct_change(periods=12) * 100
 
 # Filter table
-yoy_table = forecast_df.loc[forecast_df.index >= '2020', 'YoY Change']
+yoy_table = forecast_df.loc[forecast_df.index >= '2021', 'YoY Change']
+
+# Sort index descending
+yoy_table = yoy_table.sort_index(ascending=False)  
 
 # Display table  
 st.table(yoy_table.round(2))
