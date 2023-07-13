@@ -2,14 +2,13 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from pmdarima import auto_arima
-from sklearn.metrics import mean_absolute_percentage_error
 
 st.title('North Cyprus CPI Forecast')
 
 # Load data
-df = pd.read_csv('inflation88seti.csv')  
+df = pd.read_csv('inflation88seti.csv')
 
-# Prepare data
+# Prepare datetime
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
 df.set_index('Date', inplace=True)
 df.index = df.index.to_period('M').to_timestamp()
@@ -19,41 +18,29 @@ df.index.freq = 'MS'
 forecast_df = df['KKTC_CPI'].to_frame('Forecast') 
 
 # Slider
-periods = st.slider('Periods', min_value=6, max_value=24, value=12)  
+periods = st.slider('Periods', min_value=6, max_value=24, value=12)
 
 # Model
 model = auto_arima(df['KKTC_CPI'])
 
-# Forecasts
-fc = model.predict(periods)  
+# In-sample forecasts
+f, conf_int = model.predict_in_sample(return_conf_int=True) 
+
+# Add in-sample cone
+fig.add_ribbon(x=conf_int.index, ymin=conf_int[:,0], 
+               ymax=conf_int[:,1], fillcolor='blue', opacity=0.2)
+
+# Out-of-sample forecasts
+fc = model.predict(periods) 
 fdf = pd.DataFrame(fc, columns=['Forecast'])
-fdf.index = pd.date_range(start=df.index[-1], periods=len(fc), freq='MS')
+fdf.index = pd.date_range(start=df.index[-1], periods=len(fc), freq='MS')  
 
-# Concatenate 
-forecast_df = pd.concat([forecast_df, fdf])
+# Add out-of-sample cone
+fig.add_ribbon(x=fdf.index, ymin=conf_int[:,0],
+               ymax=conf_int[:,1], fillcolor='green', opacity=0.2)
+               
+# Plot forecast line               
+fig.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast')
 
-# Calculate YoY
-forecast_df['YoY Change'] = forecast_df['Forecast'].pct_change(periods=12) * 100
-
-# Filter table
-yoy_table = forecast_df.loc[forecast_df.index >= '2020', 'YoY Change'] 
-
-# Sort table
-yoy_table = yoy_table.sort_index(ascending=False)
-
-# Plot 1
-fig1 = px.line(forecast_df, x=forecast_df.index, y='Forecast')
-
-# Plot 2 
-fig2 = px.line(forecast_df, x=forecast_df.index, y='YoY Change')
-
-# Model metric  
-smape = mean_absolute_percentage_error(df['KKTC_CPI'], model.predict_in_sample())
-st.markdown(f"**SMAPE:** {smape:.2%}")
-
-# Display plots
-st.plotly_chart(fig1) 
-st.plotly_chart(fig2)
-
-# Display table
-st.table(yoy_table.round(2))
+# Display plot
+st.plotly_chart(fig)
