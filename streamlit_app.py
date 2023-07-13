@@ -1,42 +1,42 @@
 import pandas as pd
 import streamlit as st
-import plotly.express as px
+import plotly.express as px  
 from pmdarima import auto_arima
 
 st.title('North Cyprus CPI Forecast')
 
 # Load data
-df = pd.read_csv('inflation88seti.csv')
+df = pd.read_csv('inflation88seti.csv') 
 
 # Prepare datetime
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
 df.set_index('Date', inplace=True)
 df.index = df.index.to_period('M').to_timestamp()
-df.index.freq = 'MS'
+df.index.freq = 'MS'  
 
-# Copy actual data 
+# Copy actual data
 forecast_df = df['KKTC_CPI'].to_frame('Forecast')
 
-# Slider
-periods = st.slider('Periods', min_value=6, max_value=24, value=12)  
+# Slider 
+periods = st.slider('Periods', min_value=6, max_value=24, value=12)
 
 # Model
 model = auto_arima(df['KKTC_CPI'])
 
 # Forecasts
-fc = model.predict(periods)  
+fc = model.predict(periods)
 fdf = pd.DataFrame(fc, columns=['Forecast'])
 fdf.index = pd.date_range(start=df.index[-1], periods=len(fc), freq='MS')
 
-# Append forecasts
-forecast_df = forecast_df.append(fdf)
+# Concatenate
+forecast_df = pd.concat([forecast_df, fdf])  
 
-# Plot 
+# Plot
 fig = px.line(forecast_df, x=forecast_df.index, y='Forecast')
 st.plotly_chart(fig)
 
 # Calculate YoY
-forecast_df['YoY Change'] = forecast_df['Forecast'].pct_change(periods=12) * 100  
+forecast_df['YoY Change'] = forecast_df['Forecast'].pct_change(periods=12) * 100
 
 # Display table
 st.table(forecast_df['YoY Change'].round(2))
