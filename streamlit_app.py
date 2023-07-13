@@ -25,7 +25,7 @@ periods = st.slider('Periods', min_value=6, max_value=24, value=12)
 st.markdown("""
 <style>
 .stSlider > div {
-  width: 75px;
+  width: 100px;
 }
 </style>  
 """, unsafe_allow_html=True)
