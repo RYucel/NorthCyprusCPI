@@ -44,7 +44,7 @@ forecast_df = pd.concat([forecast_df, fdf])
 forecast_df['YoY Change'] = forecast_df['Forecast'].pct_change(periods=12) * 100
 
 # Filter table
-yoy_table = forecast_df.loc[forecast_df.index >= '2020', 'YoY Change']
+yoy_table = forecast_df.loc[forecast_df.index >= '2022', 'YoY Change']
 
 # Sort table  
 yoy_table = yoy_table.sort_index(ascending=False)
