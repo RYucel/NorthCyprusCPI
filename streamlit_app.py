@@ -1,42 +1,38 @@
-import pandas as pd
+import pandas as pd 
 import streamlit as st
-from pmdarima import auto_arima 
+from pmdarima import auto_arima
 import matplotlib.pyplot as plt
 
 st.title('North Cyprus CPI Forecast')
 
-# Load data 
-df = pd.read_csv('inflation88seti.csv')
+# Load data
+# ...Code to load and prepare data
 
-# Convert date column to datetime properly
-df['Date'] = pd.to_datetime(df['Date'], dayfirst=True) 
-
-# Set date as index
-df.set_index('Date', inplace=True)
-
-# Convert dates to start of month  
-df.index = df.index.to_period('M').to_timestamp()
-
-# Set monthly frequency
-df.index.freq = 'MS'  
+# Slider to select forecast period
+periods = st.slider('Forecast periods', min_value=6, max_value=24, value=12) 
 
 # Train model
-model = auto_arima(df['KKTC_CPI'])  
+model = auto_arima(df['KKTC_CPI'])
 
-# Forecast
-n_periods = 24
-fc = model.predict(n_periods)  
-
-# Make future dates index
-index_of_fc = pd.date_range(start='2023-07-01', periods=n_periods, freq='MS')
-
-# Create forecast dataframe 
-forecast_df = pd.DataFrame(fc, index=index_of_fc, columns=['Prediction'])  
-
-# Plot
-fig, ax = plt.subplots()
+# Interactive plot
+fig, ax = plt.subplots() 
 df['KKTC_CPI'].plot(ax=ax)
-forecast_df.plot(ax=ax)
 
-# Display plot
-st.pyplot(fig)
+def plot_forecast():
+  # Make forecasts
+  fc = model.predict(periods)  
+  
+  # Add tooltips
+  tooltip = mpld3.plugins.PointLabelTooltip(fc.index, labels=fc['Prediction'].round(2))
+  mpld3.plugins.connect(fig, tooltip)
+  
+  # Plot forecasts
+  ax.clear()
+  df['KKTC_CPI'].plot(ax=ax)
+  fc.plot(ax=ax, legend=False)
+  
+# Call when slider changes
+st.pyplot(fig) 
+plot_forecast()
+
+st.slider.on_change(plot_forecast)
