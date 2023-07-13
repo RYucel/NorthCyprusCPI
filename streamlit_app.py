@@ -34,20 +34,20 @@ model = auto_arima(df['KKTC_CPI'])
 fig, ax = plt.subplots()
 df['KKTC_CPI'].plot(ax=ax)
 
+# Tooltips
+tooltip = mpld3.plugins.PointLabelTooltip(df.index, labels=df['KKTC_CPI'].round(2))
+
 def plot_forecast():
 
-  # Forecast 
-  fc = model.predict(periods)   
+  # Forecast
+  fc = model.predict(periods)    
 
-  # Tooltips
-  tooltip = mpld3.plugins.PointLabelTooltip(fc.index, labels=fc['Prediction'].round(2))
-  
-  # Plot
+  # Plot 
   ax.clear()
-  df['KKTC_CPI'].plot(ax=ax)  
+  df['KKTC_CPI'].plot(ax=ax)
   fc.plot(ax=ax, legend=False)
 
-  # Connect tooltip
+  # Tooltip
   mpld3.plugins.connect(fig, tooltip)
 
 # Initial call
