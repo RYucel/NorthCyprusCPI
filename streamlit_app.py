@@ -35,17 +35,20 @@ fig, ax = plt.subplots()
 df['KKTC_CPI'].plot(ax=ax)
 
 def plot_forecast():
-  # Make forecasts
+
+  # Forecast 
   fc = model.predict(periods)   
-  
+
   # Tooltips
   tooltip = mpld3.plugins.PointLabelTooltip(fc.index, labels=fc['Prediction'].round(2))
-  mpld3.plugins.connect(fig, tooltip)
   
   # Plot
   ax.clear()
-  df['KKTC_CPI'].plot(ax=ax)
+  df['KKTC_CPI'].plot(ax=ax)  
   fc.plot(ax=ax, legend=False)
+
+  # Connect tooltip
+  mpld3.plugins.connect(fig, tooltip)
 
 # Initial call
 plot_forecast()  
