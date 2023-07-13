@@ -22,25 +22,20 @@ model = auto_arima(df['KKTC_CPI'])
 
 # Forecasts
 fc = model.predict(periods)
-fc_df = pd.DataFrame(fc, columns=['Forecast']) 
+fc_df = pd.DataFrame(fc, columns=['KKTC_CPI']) 
 
-fdf = pd.DataFrame(fc, columns=['Forecast'])
+fdf = pd.DataFrame(fc, columns=['KKTC_CPI'])
 fdf.index = pd.date_range(start=df.index[-1] + pd.DateOffset(months=1), periods=len(fc), freq='MS')
 
 # Add forecast column to fdf
-fdf = pd.concat([fdf, fc_df['Forecast']], axis=1)
+fdf = pd.concat([fdf, fc_df['KKTC_CPI']], axis=1)
 
 # YoY Forecast
-fc_yoy = model.predict(periods + 12)
-fc_yoy_df = pd.DataFrame(fc_yoy, columns=['YoY Forecast'])
-fc_yoy_df.index = pd.date_range(start=df.index[-1] + pd.DateOffset(months=13), periods=len(fc_yoy), freq='MS')
-
-# Add yoy forecast column to fdf
-fdf = pd.concat([fdf, fc_yoy_df['YoY Forecast']], axis=1)
+fdf['YoY Forecast'] = fdf['KKTC_CPI'].pct_change(periods=12) * 100
 
 # CPI Chart
 fig1 = px.line(df, x=df.index, y='KKTC_CPI')
-fig1.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast')
+fig1.add_scatter(x=fdf.index, y=fdf['KKTC_CPI'], mode='lines', name='Forecast')
 fig1.update_traces(hovertemplate='Date: %{x}<br>CPI: %{y}') 
 
 # YoY Change  
