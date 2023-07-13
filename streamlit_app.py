@@ -1,8 +1,8 @@
 import pandas as pd
 import streamlit as st
+import plotly.express as px
 from pmdarima import auto_arima
-import matplotlib.pyplot as plt
-import mpld3
+
 
 st.title('North Cyprus CPI Forecast')
 
@@ -20,32 +20,25 @@ df.index = df.index.to_period('M').to_timestamp()
 df.index.freq = 'MS'
 df = df.copy()
 
-# Create slider
-st.session_state["slider"] = st.slider('Periods', min_value=6, max_value=24, value=12)
-
-# Access value 
-periods = st.session_state["slider"]
+# Slider
+periods = st.slider('Periods', min_value=6, max_value=24, value=12)  
 
 # Model
 model = auto_arima(df['KKTC_CPI'])
 
+# Plotly figure
+fig = px.line(df, x=df.index, y='KKTC_CPI')
+
+# Add forecast
+fc = model.predict(periods)
+fdf = pd.DataFrame(fc, columns=['Forecast'])
+fdf.index = df.index[-1] + pd.DateOffset(months=1):df.index[-1] + pd.DateOffset(months=len(fc))
+fig.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast')
+
 # Tooltips
-tooltip = mpld3.plugins.PointLabelTooltip(df.index, labels=df['KKTC_CPI'].round(2)) 
+fig.update_traces(hovertemplate='Date: %{x}<br>Value: %{y}')
 
-# Plot 
-fig, ax = plt.subplots()
-df['KKTC_CPI'].plot(ax=ax)
-
-# Function
-def plot_forecast():
-  fc = model.predict(periods)
-  
-  ax.clear()
-  df['KKTC_CPI'].plot(ax=ax)
-  fc.plot(ax=ax, legend=False)
-  
-  mpld3.plugins.connect(fig, tooltip)
-  
+st.plotly_chart(fig)
 # Initial call
 plot_forecast()  
 
