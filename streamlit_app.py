@@ -22,7 +22,7 @@ forecast_df.index.name = 'Date'
 
 # Plot
 fig, ax = plt.subplots()
-df['NorthCyprusCPI'].plot(ax=ax)
+df['KKTC_CPI'].plot(ax=ax)
 forecast_df.plot(ax=ax, color='r')
 ax.fill_between(forecast_df.index, 
                 confint[:, 0],
