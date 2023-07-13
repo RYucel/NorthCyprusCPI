@@ -3,33 +3,33 @@ import streamlit as st
 from pmdarima import auto_arima
 import matplotlib.pyplot as plt
 
-st.title('North Cyprus CPI Forecast')
+st.title('North Cyprus CPI Forecast') 
 
 # Load data
-df = pd.read_csv('inflation88seti.csv') 
+df = pd.read_csv('inflation88seti.csv')  
 
-# Train autoARIMA model
-model = auto_arima(df['KKTC_CPI'], start_p=1, start_q=1, max_p=3, max_q=3, m=12, start_P=0, seasonal=True, d=1, D=1, trace=True, error_action='ignore', suppress_warnings=True)
+# Make sure index is datetime
+df['Date'] = pd.to_datetime(df['Date'])
+df.set_index('Date', inplace=True)
 
-# Forecast into future
+# Set monthly frequency 
+df.index.freq = 'MS'
+
+# Train model
+model = auto_arima(df['KKTC_CPI'])
+
+# Forecast  
 n_periods = 24
-fc, confint = model.predict(n_periods=n_periods, return_conf_int=True)
-index_of_fc = pd.date_range(start='2023-07-01', end='2025-06-30', freq='MS')
+fc = model.predict(n_periods=n_periods)
 
-# Make DataFrame for forecast
+# Make forecast dataframe
+index_of_fc = pd.date_range(start='2023-07-01', periods=n_periods, freq='MS')
 forecast_df = pd.DataFrame(fc, index=index_of_fc, columns=['Prediction'])
-forecast_df.index.name = 'Date'
 
 # Plot
 fig, ax = plt.subplots()
 df['KKTC_CPI'].plot(ax=ax)
-forecast_df.plot(ax=ax, color='r')
-ax.fill_between(forecast_df.index, 
-                confint[:, 0],
-                confint[:, 1], color='k', alpha=.25)
+forecast_df.plot(ax=ax)
 
-ax.set_xlabel('Date')
-ax.set_ylabel('CPI')
-
-# Show plot in app
+# Display plot
 st.pyplot(fig)
