@@ -30,9 +30,14 @@ model = auto_arima(df['KKTC_CPI'])
 fig = px.line(df, x=df.index, y='KKTC_CPI')
 
 # Add forecast
+# Forecasts
 fc = model.predict(periods)
 fdf = pd.DataFrame(fc, columns=['Forecast'])
-fdf.index = df.index[-1] + pd.DateOffset(months=1):df.index[-1] + pd.DateOffset(months=len(fc))
+
+# Generate forecast index
+fdf.index = pd.date_range(start=df.index[-1] + pd.DateOffset(months=1), periods=len(fc), freq='MS') 
+
+# Plot
 fig.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast')
 
 # Tooltips
