@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from pmdarima import auto_arima
+from sklearn.metrics import mean_absolute_percentage_error
 
 st.title('North Cyprus CPI Forecast') 
 
