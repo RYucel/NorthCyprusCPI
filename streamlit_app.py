@@ -35,15 +35,15 @@ fdf.rename(columns={'KKTC_CPI': 'Forecast'}, inplace=True)
 fdf['YoY Forecast'] = df['KKTC_CPI'].pct_change(periods=12) * 100
 
 # CPI Chart
-fig1 = px.line(df, x=df.index, y='KKTC_CPI')
-fig1.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast')
+fig1 = px.line(df, x=df.index, y='KKTC_CPI', color='blue', label='Actual')
+fig1.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast', color='red')
 fig1.update_traces(hovertemplate='Date: %{x}<br>CPI: %{y}') 
 
 # YoY Change  
 df['YoY Change'] = df['KKTC_CPI'].pct_change(periods=12) * 100
 
-fig2 = px.line(df, x=df.index, y='YoY Change')
-fig2.add_scatter(x=fdf.index, y=fdf['YoY Forecast'], mode='lines', name='Forecast')
+fig2 = px.line(df, x=df.index, y='YoY Change', color='blue', label='Actual')
+fig2.add_scatter(x=fdf.index, y=fdf['YoY Forecast'], mode='lines', name='Forecast', color='red')
 fig2.update_traces(hovertemplate='Date: %{x}<br>YoY Change: %{y:.2f}%')
 
 st.plotly_chart(fig1)
