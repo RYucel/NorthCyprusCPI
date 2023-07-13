@@ -55,6 +55,11 @@ fig1 = px.line(forecast_df, x=forecast_df.index, y='Forecast')
 # Plot 2
 fig2 = px.line(forecast_df, x=forecast_df.index, y='YoY Change')
 
+# Model metric
+smape = mean_absolute_percentage_error(
+    df['KKTC_CPI'], model.predict_in_sample())
+st.markdown(f"**SMAPE:** {smape:.2%}")
+
 # Arrange plots
 left_column, right_column = st.columns(2)
 left_column.plotly_chart(fig1, use_container_width=True)
