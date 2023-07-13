@@ -9,7 +9,7 @@ st.title('North Cyprus CPI Forecast')
 df = pd.read_csv('inflation88seti.csv')  
 
 # Make sure index is datetime
-df['Date'] = pd.to_datetime(df['Date'])
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
 df.set_index('Date', inplace=True)
 
 # Set monthly frequency 
