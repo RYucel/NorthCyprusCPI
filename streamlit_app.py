@@ -1,30 +1,37 @@
 import pandas as pd
 import streamlit as st
-from pmdarima import auto_arima
+from pmdarima import auto_arima 
 import matplotlib.pyplot as plt
 
-st.title('North Cyprus CPI Forecast') 
+st.title('North Cyprus CPI Forecast')
 
-# Load data
-df = pd.read_csv('inflation88seti.csv')  
+# Load data 
+df = pd.read_csv('inflation88seti.csv')
 
-# Make sure index is datetime
-df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+# Convert date column to datetime properly
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True) 
+
+# Set date as index
 df.set_index('Date', inplace=True)
 
-# Set monthly frequency 
-df.index.freq = 'MS'
+# Convert dates to start of month  
+df.index = df.index.to_period('M').to_timestamp()
+
+# Set monthly frequency
+df.index.freq = 'MS'  
 
 # Train model
-model = auto_arima(df['KKTC_CPI'])
+model = auto_arima(df['KKTC_CPI'])  
 
-# Forecast  
+# Forecast
 n_periods = 24
-fc = model.predict(n_periods=n_periods)
+fc = model.predict(n_periods)  
 
-# Make forecast dataframe
+# Make future dates index
 index_of_fc = pd.date_range(start='2023-07-01', periods=n_periods, freq='MS')
-forecast_df = pd.DataFrame(fc, index=index_of_fc, columns=['Prediction'])
+
+# Create forecast dataframe 
+forecast_df = pd.DataFrame(fc, index=index_of_fc, columns=['Prediction'])  
 
 # Plot
 fig, ax = plt.subplots()
