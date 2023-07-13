@@ -43,7 +43,7 @@ fdf['YoY Forecast'] = fc_df.pct_change(periods=12) * 100
 fdf['YoY Forecast'] = fdf['YoY Forecast'].shift(12)
 
 fig2 = px.line(df, x=df.index, y='YoY Change')
-fig2.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast')
+fig2.add_scatter(x=fdf.index, y=fdf['YoY Forecast'], mode='lines', name='Forecast')
 fig2.update_traces(hovertemplate='Date: %{x}<br>YoY Change: %{y:.2f}%')
 
 st.plotly_chart(fig1)
