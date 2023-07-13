@@ -17,8 +17,17 @@ df.index.freq = 'MS'
 # Copy data
 forecast_df = df['KKTC_CPI'].to_frame('Forecast')
 
-# Smaller slider
-periods = st.slider('Periods', min_value=6, max_value=24, value=12, width=75)
+# Slider 
+periods = st.slider('Periods', min_value=6, max_value=24, value=12)
+
+# CSS
+st.markdown("""
+<style>
+.stSlider > div {
+  width: 75px;
+}
+</style>  
+""", unsafe_allow_html=True)
 
 # Model
 model = auto_arima(df['KKTC_CPI'])
