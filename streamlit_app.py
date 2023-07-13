@@ -32,7 +32,7 @@ fdf = pd.concat([fdf, fc_df['KKTC_CPI']], axis=1)
 fdf.rename(columns={'KKTC_CPI': 'Forecast'}, inplace=True)
 
 # YoY Forecast
-fdf['YoY Forecast'] = fdf['KKTC_CPI'].pct_change(periods=12) * 100
+fdf['YoY Forecast'] = df['KKTC_CPI'].pct_change(periods=12) * 100
 
 # CPI Chart
 fig1 = px.line(df, x=df.index, y='KKTC_CPI')
