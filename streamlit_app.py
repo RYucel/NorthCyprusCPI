@@ -19,13 +19,13 @@ df.index.freq = 'MS'
 forecast_df = df['KKTC_CPI'].to_frame('Forecast')
 
 # Slider 
-periods = st.slider('Periods', min_value=6, max_value=24, value=12)
+periods = st.slider('Forecast Periods', min_value=6, max_value=24, value=12)
 
 # CSS
 st.markdown("""
 <style>
 .stSlider > div {
-  width: 100px;
+  width: 150px;
 }
 </style>  
 """, unsafe_allow_html=True)
