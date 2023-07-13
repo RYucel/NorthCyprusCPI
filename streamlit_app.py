@@ -29,13 +29,14 @@ fdf.index = pd.date_range(start=df.index[-1] + pd.DateOffset(months=1), periods=
 
 # Add forecast column to fdf
 fdf = pd.concat([fdf, fc_df['KKTC_CPI']], axis=1)
+fdf.rename(columns={'KKTC_CPI': 'Forecast'}, inplace=True)
 
 # YoY Forecast
 fdf['YoY Forecast'] = fdf['KKTC_CPI'].pct_change(periods=12) * 100
 
 # CPI Chart
 fig1 = px.line(df, x=df.index, y='KKTC_CPI')
-fig1.add_scatter(x=fdf.index, y=fdf['KKTC_CPI'], mode='lines', name='Forecast')
+fig1.add_scatter(x=fdf.index, y=fdf['Forecast'], mode='lines', name='Forecast')
 fig1.update_traces(hovertemplate='Date: %{x}<br>CPI: %{y}') 
 
 # YoY Change  
