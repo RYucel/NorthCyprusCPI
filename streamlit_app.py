@@ -6,7 +6,7 @@ from pmdarima import auto_arima
 st.title('North Cyprus CPI Forecast')
 
 # Load data
-df = pd.read_csv('data.csv')
+df = pd.read_csv('inflation88seti.csv')
 
 # Prepare datetime 
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)  
